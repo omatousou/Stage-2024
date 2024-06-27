@@ -1,0 +1,51 @@
+[x, y,p] = Anatole_spectro_mirrror(calibration-90, spectro,1);
+range2 = 115:0.5:185;
+DATA2 =zeros(length(range2),2000);
+j = 1;
+u = 1;
+DERIV2 = DATA2;
+Xtemp2 = zeros(length(range2),2);
+angletemp2 = range2*0;
+SIG2 = DERIV2;
+for i = range2
+    [x, y,p] = Anatole_spectro_mirrror(i, spectro,2);
+    DATA2(j,:) = y;
+    plot(x,DATA2(j,:))
+    hold on
+    med=medfilt1(DATA2(j,:), 3);
+    sig = (med-min(med))/max(med-min(med));
+%     [outliers, TF] = rmoutliers(sig, 'grubbs');
+%     % Interpolation linéaire pour remplacer les outliers
+%     x_2 = 1:length(sig);
+%     sig_cleaned = sig;
+%     sig_cleaned(TF) = interp1(x_2(~TF), sig(~TF), x_2(TF), 'linear');
+%     a = fft(sig_cleaned);
+%     a(100:1900)=0;
+%     b = ifft(a);
+%     DERIV2(j,:)= abs(b);
+%     DERIV2(j,:)= rmoutliers(DERIV2(j,:),"grubbs");
+    SIG2(j,:)=sig;
+    DERIV2(j,:) = sig>0.2;
+    Xfirst2 = find( DERIV2(j,:) == 1, 1, 'first' );
+    Xlast2 = find( DERIV2(j,:) == 1, 1, 'last' );
+    if isempty(Xlast2)==0 || isempty(Xfirst2)==0
+        if (x(Xlast2)-x(Xfirst2)) >5 && (x(Xlast2)-x(Xfirst2))  <25
+            Xtemp2(u,:) =[x(Xfirst2),x(Xlast2)];
+            angletemp2(u)=i;
+            u=u+1;
+            fprintf("ADDED\n")
+            disp([x(Xfirst2),x(Xlast2),DATA2(j,Xfirst2),DATA2(j,Xlast2)])
+            scatter([x(Xfirst2),x(Xlast2)],[DATA2(j,Xfirst2),DATA2(j,Xlast2)])
+        end
+    end
+    j = j+1;
+end
+hold off
+X2 = zeros(length(find(Xtemp2(:,1)~=0)),2);
+X2 = Xtemp2(1:u-1,:);
+%angle = zeros(length(find(angletemp~=0)));
+angle2 = angletemp2(1:u-1);
+[x2LP, neff2LP, phase2LP] = AnatoleCurveFit(angle2,X2(:,1),max(X2(:,1)),angle2(X2(:,1)==max(X2(:,1))));
+[x2SP, neff2SP, phase2SP] = AnatoleCurveFit(angle2,X2(:,2),max(X2(:,2)),angle2(X2(:,2)==max(X2(:,2))));
+calibration2 = (mod(phase2LP,180)+mod(phase2SP,180))/2;
+[x, y,p] = Anatole_spectro_mirrror(calibration2, spectro,2);

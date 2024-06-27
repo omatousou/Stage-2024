@@ -1,0 +1,22 @@
+
+mirror_line.delete;
+mirror_line = elliptec_driver([1,2,3],'COM8');
+x01 = -11.9;
+set_position(mirror_line,1,x01+1);
+angle = linspace(x01-60,x01+60,121);
+
+
+% %set_position(mirror_line,1,x01)
+% %set_position(mirror_line,2,x02+28)
+ax = gca;
+x = ax.Children.XData;
+y = ax.Children.YData;
+% 
+% plot(x,y)
+
+
+
+
+
+
+[x,y] = get_spectro()
