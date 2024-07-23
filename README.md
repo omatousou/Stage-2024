@@ -1,3 +1,3 @@
-Discord : omatousou \n
+Discord : omatousou
 
-email : anatole.c@hotmail.fr
+Email : anatole.c@hotmail.fr
